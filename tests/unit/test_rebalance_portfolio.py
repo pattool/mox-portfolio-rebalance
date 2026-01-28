@@ -1,3 +1,6 @@
+# ------------------------------------------------------------------
+#                             IMPORTS
+# ------------------------------------------------------------------
 import pytest
 from script.rebalance_portfolio import (
     run_script,
@@ -12,7 +15,9 @@ from script.rebalance_portfolio import (
 )
 import boa
 
-
+# ------------------------------------------------------------------
+#                         TESTS_FUNCTIONS
+# ------------------------------------------------------------------
 def test_run_script_returns_contracts(active_network):
     """Verify run_script returns USDC, WETH, aUSDC, and aWETH contracts."""
     if active_network.is_local_or_forked_network():
@@ -155,6 +160,9 @@ def test_run_script_returns_four_contracts(rebalance_contracts):
     assert a_weth is not None
 
 
+# ------------------------------------------------------------------
+#                     TESTS_FUNCTIONS_CONFTEST
+# ------------------------------------------------------------------
 def test_setup_fixture_returns_contracts(setup):
     """Verify setup fixture returns USDC and WETH contracts."""
     usdc, weth = setup
