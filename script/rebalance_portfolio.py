@@ -55,13 +55,13 @@ def deposit(pool_contract, token, amount):
     if allowed_amount < amount:
         token.approve(pool_contract.address, amount)
     print(f"Depositing {token.name()} into Aave contract {pool_contract.address}")
-    pool_contract.supply(token.address, amount, boa.env.eoa, REFERRAL_CODE)
+    pool_contract.supply(token.address, amount, boa.env.eoa, REFERRAL_CODE) # verify on aave doc
           
 
 # Get Chainlink Pricefeed on ETHEREUM MAINNET
 def get_price(feed_name: str) -> float:
     active_network = get_active_network()
-    price_feed = active_network.manifest_named(feed_name)
+    price_feed = active_network.manifest_named(feed_name) # feed_name: usdc_usd or eth_usd
     price = price_feed.latestAnswer()
     decimals = price_feed.decimals()
     decimals_normalized = 10 ** decimals
@@ -146,7 +146,7 @@ def run_script() -> [ABIContract, ABIContract, ABIContract, ABIContract]:
 
     # Where we will put money to it
     pool_address = aavev3_pool_address_provider.getPool() 
-    pool_contract = active_network.manifest_named("pool", address=pool_address)
+    pool_contract = active_network.manifest_named("pool", address=pool_address) # address can change
     
     if active_network.is_local_or_forked_network():
         _add_eth_balance() # add eth
@@ -180,14 +180,15 @@ def run_script() -> [ABIContract, ABIContract, ABIContract, ABIContract]:
     print()
 
     # Get list of Atokens
-    print("Scanning Atokens, make take a while...")
+    print("Scanning for WETH and USDC, make take a while...\n")
     aave_protocol_data_provider = active_network.manifest_named("aave_protocol_data_provider")
     a_tokens = aave_protocol_data_provider.getAllATokens() # give a list of tuples: [(token, address), (token, address)]
     print()
     #print("List Atokens:", a_tokens)
 
     # Scanning for WETH and USDC
-    print("Scan for WETH and USDC")
+    print("Atokens for WETH and USDC ....")
+    print("------------------------------")
     for a_token in a_tokens:
         if"WETH" in a_token[0]:
             a_weth = active_network.manifest_named("usdc", address=a_token[1])
@@ -201,16 +202,17 @@ def run_script() -> [ABIContract, ABIContract, ABIContract, ABIContract]:
     a_usdc_balance = a_usdc.balanceOf(boa.env.eoa) # 6 decimals
     a_weth_balance = a_weth.balanceOf(boa.env.eoa) # 18 decimals
 
+    # Normalized the amounts
     a_usdc_balance_normalized = a_usdc_balance / int(1e6)  # 1000000
     a_weth_balance_normalized = a_weth_balance / int(1e18) # 1000000000000000000 
-    print("aUSDC balance:", a_usdc_balance_normalized)
-    print("aWETH balance:", a_weth_balance_normalized)
+    print("aUSDC balance:", a_usdc_balance_normalized) # 100 -> around 100$ price
+    print("aWETH balance:", a_weth_balance_normalized) # 1 ETH
 
     # Get Price for usdc and weth
     usdc_price = get_price("usdc_usd")
     weth_price = get_price("eth_usd")
-    print("USDC price:", usdc_price)
-    print("WETH price:", weth_price)
+    print("USDC price:", usdc_price) 
+    print("WETH price:", weth_price) 
     print()
         
     # Total value
@@ -250,13 +252,11 @@ def run_script() -> [ABIContract, ABIContract, ABIContract, ABIContract]:
     print(f"aWETH balance: {a_weth.balanceOf(boa.env.eoa)}")
     print()
 
-
     # Rebalance Trades 
     usdc_data = {"balance": a_usdc_balance_normalized, "price": usdc_price, "contract": usdc}
     weth_data = {"balance": a_weth_balance_normalized, "price": weth_price, "contract": weth}
     target_allocations = {"usdc": 0.3, "weth": 0.7}  
     
-
     trades = calculate_rebalancing_trades(usdc_data, weth_data, target_allocations)
     print("Rebalancing Trades:")
     #for k, v in trades.items():
@@ -339,7 +339,7 @@ def run_script() -> [ABIContract, ABIContract, ABIContract, ABIContract]:
     print(f"Current percent allocation of USDC: {usdc_percent_allocation * 100:.2f}%")
     print(f"Current percent allocation of WETH: {weth_percent_allocation * 100:.2f}%")
     print()
-
+    
     return usdc, weth, a_usdc, a_weth
 
     
