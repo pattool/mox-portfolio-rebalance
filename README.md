@@ -17,7 +17,7 @@
 mox run rebalance_portfolio
 ```
 
-2. Run tests (no tests for the moment)
+2. Run tests 
 
 ```
 mox test
