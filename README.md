@@ -14,13 +14,13 @@
 1. Deploy to a fake local network that titanoboa automatically spins up!
 
 ```bash
-mox run rebalance_portfolio
+mox run rebalance_portfolio --network eth-forked
 ```
 
 2. Run tests 
 
 ```
-mox test
+mox test -s
 ```
 
 _For documentation, please run `mox --help` or visit [the Moccasin documentation](https://cyfrin.github.io/moccasin)_

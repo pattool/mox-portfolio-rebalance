@@ -15,3 +15,11 @@ out = "out"
 dot_env = ".env"
 save_abi_path = "abis"
 default_network_name = "eth-forked"
+
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-mock",
+    # ... other dev dependencies
+]

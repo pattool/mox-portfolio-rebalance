@@ -203,4 +203,3 @@ def test_rebalance_contracts_fixture_on_local_network(rebalance_contracts, activ
         assert a_usdc is not None
         assert a_weth is not None
 
-
